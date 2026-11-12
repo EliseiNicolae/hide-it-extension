@@ -45,16 +45,88 @@ function popupFrame(popupShot, w, h) {
   </body></html>`;
 }
 
-// README image: the same page before and after, side by side. Transparent around the two
-// shots and mid-gray labels, so it sits well on GitHub's light and dark themes.
+// README image: the same article page before (the picker outlining the sidebar it's about to
+// hide) and after, side by side. Transparent around the shots and mid-gray labels, so it sits
+// well on GitHub's light and dark themes. Rendered at 2× so it stays sharp on retina screens.
+const README_VIEW = { width: 1240, height: 720 }; // wide enough for the picker bar to clear the logo
+const PANEL_W = 800;
+const PANEL_H = Math.round((PANEL_W * README_VIEW.height) / README_VIEW.width);
 function beforeAfter(before, after) {
-  const panel = (shot, label) => `<figure style="margin:0;width:800px">
+  const panel = (shot, label) => `<figure style="margin:0;width:${PANEL_W}px">
       <figcaption style="margin:0 0 10px 2px;font-size:20px;font-weight:600;color:#8b949e">${label}</figcaption>
-      <img src="${dataUrl(shot)}" style="display:block;width:800px;height:500px;border-radius:10px;box-shadow:0 0 0 1px rgba(128,128,128,.35)">
+      <img src="${dataUrl(shot)}" style="display:block;width:${PANEL_W}px;height:${PANEL_H}px;border-radius:10px;box-shadow:0 0 0 1px rgba(128,128,128,.35)">
     </figure>`;
   return `<!doctype html><html><body style="margin:0;background:transparent;font-family:${FONT}">
     <div style="display:flex;gap:40px;padding:12px 20px 20px">${panel(before, 'Before')}${panel(after, 'After')}</div>
   </body></html>`;
+}
+
+async function readmeImage(port) {
+  const host = 'northline.example';
+  const profile = fs.mkdtempSync(path.join(os.tmpdir(), 'hide-it-readme-'));
+  const ctx = await chromium.launchPersistentContext(profile, {
+    channel: 'chromium',
+    headless: true,
+    viewport: README_VIEW,
+    deviceScaleFactor: 2,
+    args: [`--disable-extensions-except=${EXT}`, `--load-extension=${EXT}`, `--host-resolver-rules=MAP ${host} 127.0.0.1`],
+  });
+  try {
+    let [sw] = ctx.serviceWorkers();
+    if (!sw) sw = await ctx.waitForEvent('serviceworker');
+    const page = ctx.pages()[0] || (await ctx.newPage());
+    await page.goto(`http://${host}:${port}/demo-article.html`);
+    await wait(300);
+    const tabId = await sw.evaluate(async (h) => (await chrome.tabs.query({})).find((t) => (t.url || '').includes(h)).id, host);
+    const KEY = `site:${host}`;
+    const lastRule = () => sw.evaluate(async (k) => (((await chrome.storage.local.get(k))[k] || {}).rules || []).pop(), KEY);
+    await sw.evaluate(async (id) => chrome.tabs.sendMessage(id, { type: 'startPicker' }), tabId);
+
+    // Point at the sidebar and find how many ↑ outline all of it (pick, read the rule, undo).
+    const SIDEBAR = 'aside[aria-label="Sidebar"]';
+    const bb = await page.locator('.most h3').boundingBox();
+    const x = bb.x + 60;
+    const y = bb.y + bb.height / 2;
+    const aim = async (ups) => {
+      await page.mouse.move(x - 2, y);
+      await page.mouse.move(x, y);
+      for (let i = 0; i < ups; i++) await page.keyboard.press('ArrowUp');
+      await wait(150);
+    };
+    let ups = -1;
+    for (let k = 0; k <= 5 && ups < 0; k++) {
+      await aim(k);
+      await page.mouse.click(x, y);
+      await wait(200);
+      const r = await lastRule();
+      await page.keyboard.press('Meta+z');
+      await wait(200);
+      if (r && r.selector === SIDEBAR) ups = k;
+    }
+    if (ups < 0) throw new Error('could not outline the sidebar');
+
+    // A fresh page for the real shots: no "Shown again" toast left from the search above.
+    await page.reload();
+    await wait(400);
+    await sw.evaluate(async (id) => chrome.tabs.sendMessage(id, { type: 'startPicker' }), tabId);
+    await aim(ups);
+    const before = await page.screenshot();
+    await page.mouse.click(x, y);
+    await wait(250);
+    await page.keyboard.press('Escape');
+    await page.mouse.move(5, README_VIEW.height - 5);
+    await wait(400);
+    const after = await page.screenshot();
+
+    await page.setViewportSize({ width: PANEL_W * 2 + 80, height: PANEL_H + 74 });
+    await page.setContent(beforeAfter(before, after));
+    await page.waitForLoadState('load');
+    fs.mkdirSync(path.join(EXT, 'docs'), { recursive: true });
+    await page.screenshot({ path: path.join(EXT, 'docs/before-after.png'), omitBackground: true });
+  } finally {
+    await ctx.close();
+    fs.rmSync(profile, { recursive: true, force: true });
+  }
 }
 
 function promoTile(icon) {
@@ -95,8 +167,6 @@ function promoTile(icon) {
     const extId = sw.url().split('/')[2];
     const page = ctx.pages()[0] || (await ctx.newPage());
     await page.goto(`${base}/demo.html`);
-    await wait(300);
-    const rawBefore = await page.screenshot();
     const tabId = await sw.evaluate(async (h) => (await chrome.tabs.query({})).find((t) => (t.url || '').includes(h)).id, HOST);
     const startPicker = () => sw.evaluate(async (id) => chrome.tabs.sendMessage(id, { type: 'startPicker' }), tabId);
 
@@ -159,13 +229,6 @@ function promoTile(icon) {
       await compose.waitForLoadState('load');
       await compose.screenshot({ path: path.join(OUT, name) });
     }
-    const docs = path.join(EXT, 'docs');
-    fs.mkdirSync(docs, { recursive: true });
-    await compose.setViewportSize({ width: 1680, height: 576 });
-    await compose.setContent(beforeAfter(rawBefore, raw2));
-    await compose.waitForLoadState('load');
-    await compose.screenshot({ path: path.join(docs, 'before-after.png'), omitBackground: true });
-
     await compose.setViewportSize({ width: 440, height: 280 });
     await compose.setContent(promoTile(fs.readFileSync(path.join(EXT, 'icons/icon128.png'))));
     await compose.waitForLoadState('load');
@@ -173,7 +236,12 @@ function promoTile(icon) {
     console.log(fs.readdirSync(OUT).map((f) => path.join(OUT, f)).join('\n'));
   } finally {
     await ctx.close();
-    server.close();
     fs.rmSync(profile, { recursive: true, force: true });
+  }
+  try {
+    await readmeImage(server.address().port);
+    console.log(path.join(EXT, 'docs/before-after.png'));
+  } finally {
+    server.close();
   }
 })();
