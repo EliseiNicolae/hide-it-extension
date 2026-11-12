@@ -1,0 +1,302 @@
+:root {
+  color-scheme: light dark;
+  --scroll-thumb: rgba(0, 0, 0, 0.22);
+  --bg: #ffffff;
+  --fg: #1c1c1e;
+  --muted: #6e6e73;
+  --line: rgba(0, 0, 0, 0.08);
+  --row-hover: rgba(0, 0, 0, 0.045);
+  --accent: #0a84ff;
+  --accent-hover: #0077ed;
+  --accent-soft: rgba(10, 132, 255, 0.12);
+  --danger: #ff3b30;
+  --kbd-bg: rgba(255, 255, 255, 0.22);
+  --switch-off: #d1d1d6;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #1f1f21;
+    --fg: #f2f2f7;
+    --muted: #98989f;
+    --line: rgba(255, 255, 255, 0.09);
+    --row-hover: rgba(255, 255, 255, 0.06);
+    --danger: #ff453a;
+    --switch-off: #48484a;
+    --scroll-thumb: rgba(255, 255, 255, 0.2);
+  }
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 13px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+
+/* Chrome caps a popup at 600 px: the list gives up height so the popup itself never scrolls. */
+body {
+  width: 340px;
+  max-height: 600px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+body > * { flex: none; }
+body > main {
+  flex: 0 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+main > * { flex: none; }
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.title strong { font-size: 14px; font-weight: 650; }
+
+#site {
+  color: var(--muted);
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.switch { position: relative; width: 36px; height: 22px; flex: none; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 0; height: 0; }
+.switch span {
+  position: absolute;
+  inset: 0;
+  border-radius: 11px;
+  background: var(--switch-off);
+  transition: background 0.15s ease;
+}
+.switch span::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: transform 0.15s ease;
+}
+.switch input:checked + span { background: #34c759; }
+.switch input:checked + span::after { transform: translateX(14px); }
+.switch input:focus-visible + span { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+button { font: inherit; color: inherit; }
+
+.primary {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+.primary:hover { background: var(--accent-hover); }
+
+kbd {
+  padding: 1px 6px;
+  border-radius: 5px;
+  background: var(--kbd-bg);
+  font: 600 11px/1.5 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+kbd:empty { display: none; }
+
+.section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 16px 2px 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.link {
+  border: 0;
+  background: none;
+  padding: 0;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.link.armed { color: var(--danger); }
+
+main > ul {
+  flex: 0 1 auto;
+  min-height: 72px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  /* A thin thumb on a clear track, in the popup's own colors (not the system's white gutter). */
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) transparent;
+}
+main > ul:empty { min-height: 0; }
+
+li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 6px 7px 10px;
+  border-radius: 8px;
+}
+li { position: relative; }
+li:hover { background: var(--row-hover); }
+/* Straight hairlines between rows (a box-shadow would bend along the rows' rounded corners). */
+li + li::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 10px;
+  right: 6px;
+  height: 1px;
+  background: var(--line);
+}
+li:hover::before, li:hover + li::before { opacity: 0; }
+
+.text { flex: 1; min-width: 0; }
+
+.label, .selector {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.selector {
+  margin-top: 1px;
+  color: var(--muted);
+  font: 11px/1.35 var(--mono);
+}
+
+.badge {
+  display: inline-block;
+  margin-right: 6px;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font: 600 10px/1.5 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  vertical-align: 1px;
+}
+
+.mode {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  opacity: 0;
+}
+li:hover .mode, .mode:focus-visible { opacity: 1; }
+.mode:hover { background: var(--row-hover); color: var(--fg); }
+.mode.on { opacity: 1; color: var(--accent); background: var(--accent-soft); }
+
+.remove {
+  flex: none;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 24px;
+  cursor: pointer;
+}
+.remove:hover { background: var(--row-hover); color: var(--danger); }
+
+.muted { color: var(--muted); font-size: 12px; margin: 6px 2px 0; }
+
+.foot {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  line-height: 1.55;
+}
+.foot kbd {
+  padding: 0 5px;
+  background: var(--row-hover);
+  border: 1px solid var(--line);
+  color: var(--fg);
+  font-size: 10px;
+}
+.inline-icon { color: var(--fg); font-weight: 600; }
+#unsupported { margin: 4px 2px 2px; }
+
+body.paused #list { opacity: 0.5; }
+
+#transfer {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+}
+.transfer-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+.transfer-row .sep { color: var(--muted); }
+.transfer-what { color: var(--muted); font-size: 11px; }
+#paste-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: 8px;
+}
+#paste-box[hidden] { display: none; }
+#paste-input {
+  flex: 1;
+  min-width: 0;
+  resize: none;
+  padding: 7px 9px;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  outline: none;
+  background: var(--bg);
+  color: var(--fg);
+  font: 12px/1.4 -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+#paste-cancel { padding-top: 7px; }
+#transfer-msg { margin-top: 8px; }
+#transfer-msg.error { color: var(--danger); }

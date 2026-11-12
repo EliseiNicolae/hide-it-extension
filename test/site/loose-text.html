@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Loose text mock</title>
+<!-- Shaped like a TV-listing site: an SEO paragraph written straight into the column that also
+     holds the channel grid and the footer — no element of its own to point at. -->
+<style>
+  body { margin: 0; background: #0b0d16; color: #cfd3e0; font: 15px/1.5 -apple-system, system-ui, sans-serif; }
+  .row { display: flex; }
+  aside { width: 220px; padding: 20px; }
+  .col-lg-10 { flex: 1; padding: 10px 20px; }
+  .page-body { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .card { padding: 18px; border: 1px solid #333a55; border-radius: 6px; font-weight: 600; }
+  .em-child { font-size: 0.9em; color: #8ea0ff; }
+  .footer { margin-top: 10px; font-size: 13px; color: #777; }
+</style>
+</head>
+<body>
+  <div class="row">
+    <aside>General · News · Sports</aside>
+    <div class="col-lg-10 pt-1">
+      <div class="page-body">
+        <div class="card">Channel One</div><div class="card">Channel Two</div>
+        <div class="card">Movies 24</div><div class="card">Kids Club</div>
+      </div>
+      Live TV online – watch the most popular channels for free, wherever you are. Every category in one place: general, sports, movies, news, music, cartoons and documentaries. Pick a channel from the list above and start watching in a click, on any device, with nothing to install and no account to create first.
+      <br>
+      <div class="em-child">A line the site sizes in em (0.9em)</div>
+      <footer class="footer">Footer · Terms · Contact</footer>
+    </div>
+  </div>
+</body>
+</html>

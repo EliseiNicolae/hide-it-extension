@@ -1,0 +1,16 @@
+{
+  "name": "hide-it-extension",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Chrome extension: point at any part of a website and hide it for good — no flicker.",
+  "license": "MIT",
+  "scripts": {
+    "test": "node test/e2e.js",
+    "assets": "node store/make-assets.js",
+    "icons": "swift scripts/make-icons.swift icons",
+    "package": "bash scripts/package.sh"
+  },
+  "devDependencies": {
+    "playwright": "1.60.0"
+  }
+}

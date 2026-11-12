@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>X mock</title>
+<script>
+  // Frame probe: in every frame (rAF runs right before paint) record whether each target is rendered.
+  window.__probe = [];
+  window.__sheetAt = null;
+  const targets = {
+    banner: '#static-banner',
+    nav: 'nav[aria-label="Primary"]',
+    wtf: 'aside[aria-label="Who to follow"]',
+  };
+  const sheetFilled = () => {
+    const s = document.querySelector('style[data-hide-it]');
+    return !!(s && s.textContent.trim());
+  };
+  window.__sheetFilledAtHead = sheetFilled();
+  new MutationObserver(() => {
+    if (window.__sheetAt == null && sheetFilled()) window.__sheetAt = performance.now();
+  }).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
+  window.__gateAtHead = !!document.querySelector('style[data-hide-it-gate]');
+  (function tick() {
+    const rec = { t: performance.now(), op: getComputedStyle(document.documentElement).opacity };
+    for (const [k, s] of Object.entries(targets)) {
+      const el = document.querySelector(s);
+      rec[k] = el ? (el.getClientRects().length > 0 ? 'SHOWN' : 'hidden') : null;
+    }
+    window.__probe.push(rec);
+    if (window.__probe.length < 150) requestAnimationFrame(tick);
+  })();
+</script>
+<style>
+  body { margin: 0; background: #000; color: #e7e9ea; font: 15px/1.3 -apple-system, system-ui, sans-serif; }
+  .css-175oi2r { display: flex; flex-direction: column; }
+  .layout { flex-direction: row !important; justify-content: center; }
+  header { width: 275px; padding: 0 12px; }
+  nav a { display: flex; flex-direction: row; align-items: center; gap: 16px; padding: 12px; color: inherit; text-decoration: none; font-size: 20px; }
+  .post { margin: 16px 0; padding: 14px; border-radius: 999px; background: #eff3f4; color: #0f1419; text-align: center; font-weight: 700; }
+  main { width: 600px; border-left: 1px solid #2f3336; border-right: 1px solid #2f3336; min-height: 1200px; }
+  .sidebar { width: 350px; padding: 0 24px; }
+  .r-box { border: 1px solid #2f3336; border-radius: 16px; margin-top: 12px; }
+  aside h2 { margin: 0; padding: 12px 16px; font-size: 20px; }
+  .cell { padding: 12px 16px; display: flex; flex-direction: row !important; justify-content: space-between; }
+  #static-banner { background: #1d9bf0; color: #fff; padding: 10px; text-align: center; }
+</style>
+</head>
+<body>
+  <!-- Server-rendered: must be hidden from the very first paint. -->
+  <div id="static-banner" class="css-175oi2r r-1xk7izq">Static promo banner (server-rendered)</div>
+  <div id="react-root"></div>
+  <!-- A small control pinned in the top-right corner: the picker's label must not cover it. -->
+  <button id="share" style="position:fixed;top:6px;right:14px;padding:5px 12px;border:1px solid #555;border-radius:8px;background:#1a1a1a;color:#eee;font:13px system-ui">Share</button>
+  <script>
+    // Like X: the app renders long after load.
+    setTimeout(() => {
+      document.getElementById('react-root').innerHTML = `
+      <div class="css-175oi2r r-13qz1uu layout">
+        <header role="banner" class="css-175oi2r r-lrvibr r-1g40b8q">
+          <div class="css-175oi2r r-1pi2tsx"><div class="css-175oi2r r-1wbh5a2"><div class="css-175oi2r r-aqfbo4">
+            <h1 role="heading" class="css-175oi2r"><a href="/home" aria-label="Logo" class="css-175oi2r r-1habvwh" style="font-size:28px;padding:12px;color:inherit;text-decoration:none">◆</a></h1>
+            <nav aria-label="Primary" role="navigation" class="css-175oi2r r-15zivkp r-1bymd8e r-13qz1uu">
+              ${['Home','Explore','Notifications','Follow','Chat','Grok','Bookmarks','Profile','More'].map(n => `
+              <a href="/${n.toLowerCase()}" aria-label="${n}" role="link" data-testid="AppTabBar_${n}_Link" class="css-175oi2r r-6koalj r-eqz5dr r-16y2uox">
+                <div class="css-175oi2r r-sdzlij r-dnmrzs r-1awozwy"><div class="css-175oi2r">●</div><div dir="ltr" class="css-146c3p1 r-dnmrzs"><span class="css-1jxf684 r-bcqeeo">${n}</span></div></div>
+              </a>`).join('')}
+            </nav>
+            <div class="css-175oi2r r-1vr29t4"><a href="/compose/post" data-testid="SideNav_NewTweet_Button" class="post css-175oi2r r-sdzlij">Post</a></div>
+          </div></div></div>
+        </header>
+        <main role="main" class="css-175oi2r r-1oszu61">
+          <div data-testid="primaryColumn" class="css-175oi2r r-14lw9ot"><div style="padding:16px">Sample Profile · Replies</div></div>
+        </main>
+        <div data-testid="sidebarColumn" class="sidebar css-175oi2r r-aqfbo4">
+          <div class="css-175oi2r r-1d2f490"><div class="css-175oi2r r-gtdqiz">
+            <div class="css-175oi2r r-1jkafct" style="padding:12px 16px;border-radius:999px;border:1px solid #2f3336;margin-top:6px">Search</div>
+            <div id="trends-box" class="css-175oi2r r-kemksi r-1kqtdi0 r-box r-1867qdf">
+              <section aria-labelledby="trends-heading" role="region" class="css-175oi2r">
+                <div class="css-175oi2r r-1awozwy"><h2 id="trends-heading" dir="ltr" aria-level="2" role="heading" class="css-146c3p1"><span class="css-1jxf684">What’s happening</span></h2></div>
+                ${['#SpaceX', 'Premier League', 'Bitcoin'].map(t => `<div data-testid="trend" class="cell css-175oi2r r-1mmae3n"><span class="css-1jxf684">${t}</span></div>`).join('')}
+              </section>
+            </div>
+            <div class="css-175oi2r r-kemksi r-1kqtdi0 r-box r-1867qdf">
+              <aside aria-label="Who to follow" role="complementary" class="css-175oi2r">
+                <div class="css-175oi2r r-1awozwy"><h2 dir="ltr" aria-level="2" role="heading" class="css-146c3p1"><span class="css-1jxf684">You might like</span></h2></div>
+                ${['Alex Rivera','Sam Lee','Jo Park'].map(n => `
+                <div data-testid="UserCell" class="cell css-175oi2r r-1mmae3n"><span class="css-1jxf684">${n}</span><button class="css-175oi2r r-sdzlij" style="border-radius:999px;padding:4px 14px">Follow</button></div>`).join('')}
+                <a href="/i/connect_people" class="css-175oi2r r-1loqt21" style="padding:16px;color:#1d9bf0;text-decoration:none">Show more</a>
+              </aside>
+            </div>
+            <nav aria-label="Footer" role="navigation" class="css-175oi2r r-1ifxtd0" style="padding:12px 16px;font-size:13px;color:#71767b">Terms · Privacy · Cookies</nav>
+          </div></div>
+        </div>
+      </div>`;
+      window.__renderedAt = performance.now();
+    }, 300);
+  </script>
+</body>
+</html>

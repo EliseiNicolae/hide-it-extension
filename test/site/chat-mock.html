@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Chat mock</title>
+<!-- Shaped like a chat app: the thread sits in a `display: contents` wrapper (Tailwind's
+     `contents`, common in React apps) — a box of 0×0 between the thread and the big column. -->
+<style>
+  body { margin: 0; background: #1f1f1e; color: #e8e6e0; font: 16px/1.6 Georgia, serif; }
+  .app { display: flex; height: 100vh; }
+  .side { width: 260px; flex: none; border-right: 1px solid #333; padding: 16px; font-family: system-ui; }
+  .main { flex: 1; overflow-y: auto; }
+  .contents { display: contents; }
+  .thread { max-width: 700px; margin: 0 auto; padding: 40px 0; }
+  .user { margin-left: auto; width: max-content; padding: 8px 16px; border-radius: 12px; background: #2b2b29; font-family: system-ui; }
+  .msg { margin-top: 28px; }
+  .actions { display: flex; gap: 12px; margin-top: 8px; font: 12px system-ui; color: #999; }
+</style>
+</head>
+<body>
+  <div class="app">
+    <nav class="side" aria-label="Chats">New · Search · Projects</nav>
+    <div class="main">
+      <div class="contents">
+        <div class="thread">
+          <div class="user">test</div>
+          <div class="msg" data-is-streaming="false">
+            <div class="contents">
+              <p id="reply">Hi! Everything’s working on my end. What can I help you with?</p>
+            </div>
+            <div class="actions"><span>Copy</span><span>Retry</span><span>just now</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

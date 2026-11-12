@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Daily Feed</title>
+<style>
+  :root { --line: #e6e8eb; --muted: #66707a; --ink: #14181c; --brand: #3d6bff; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #fff; color: var(--ink); font: 15px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; }
+  .layout { display: flex; justify-content: center; }
+  header { width: 250px; padding: 14px 16px; }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 20px; padding: 6px 10px 18px; }
+  .logo i { width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, #6b8cff, #3d6bff); display: block; }
+  nav a { display: flex; align-items: center; gap: 14px; padding: 11px 12px; border-radius: 999px; color: inherit; text-decoration: none; font-size: 18px; }
+  nav a b { width: 22px; height: 22px; border-radius: 6px; border: 2px solid currentColor; opacity: .8; }
+  nav a.on { font-weight: 700; }
+  .cta { display: block; margin: 16px 0; padding: 13px; border-radius: 999px; background: var(--brand); color: #fff; text-align: center; font-weight: 700; }
+  main { width: 560px; border-left: 1px solid var(--line); border-right: 1px solid var(--line); min-height: 100vh; }
+  .tabs { display: flex; border-bottom: 1px solid var(--line); }
+  .tabs div { flex: 1; text-align: center; padding: 15px 0; color: var(--muted); font-weight: 600; }
+  .tabs div.on { color: var(--ink); box-shadow: inset 0 -3px 0 var(--brand); }
+  .post { display: flex; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  .av { width: 42px; height: 42px; border-radius: 50%; flex: none; display: grid; place-items: center; color: #fff; font-weight: 700; }
+  .who b { margin-right: 6px; } .who span { color: var(--muted); }
+  .post p { margin: 3px 0 8px; }
+  .card { height: 150px; border-radius: 14px; border: 1px solid var(--line); background: linear-gradient(135deg, #eef3ff, #f7f0ff); }
+  .meta { display: flex; gap: 40px; color: var(--muted); font-size: 13px; margin-top: 8px; }
+  aside.side { width: 340px; padding: 10px 20px; }
+  .search { padding: 11px 16px; border-radius: 999px; background: #f1f3f5; color: var(--muted); }
+  .box { margin-top: 14px; border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+  .box h2 { margin: 0; padding: 12px 16px 6px; font-size: 19px; }
+  .row { display: flex; align-items: center; gap: 10px; padding: 10px 16px; }
+  .row .t { flex: 1; } .row .t span { display: block; color: var(--muted); font-size: 13px; }
+  .row button { border: 0; border-radius: 999px; padding: 6px 14px; background: var(--ink); color: #fff; font-weight: 700; }
+  .more { display: block; padding: 12px 16px; color: var(--brand); }
+  .promo { margin-top: 14px; padding: 16px; border-radius: 16px; background: linear-gradient(135deg, #fff3e0, #ffe2ec); }
+  .promo b { display: block; font-size: 17px; margin-bottom: 4px; }
+  .promo button { margin-top: 10px; border: 0; border-radius: 999px; padding: 8px 16px; background: #ff5a5f; color: #fff; font-weight: 700; }
+</style>
+</head>
+<body>
+  <div class="layout">
+    <header>
+      <div class="logo"><i></i>Daily Feed</div>
+      <nav aria-label="Main">
+        <a class="on" href="#"><b></b>Home</a>
+        <a href="#"><b></b>Explore</a>
+        <a href="#"><b></b>Notifications</a>
+        <a href="#"><b></b>Messages</a>
+        <a href="#"><b></b>Bookmarks</a>
+        <a href="#"><b></b>Profile</a>
+      </nav>
+      <a class="cta" href="#">New post</a>
+    </header>
+    <main>
+      <div class="tabs"><div class="on">For you</div><div>Following</div></div>
+      <div class="post"><div class="av" style="background:#ff8a5b">MR</div><div><div class="who"><b>Maya Reed</b><span>@maya · 2h</span></div><p>Finally cleaned up my reading setup. Fewer boxes on the screen, more focus on the thing I actually opened the page for.</p><div class="card"></div><div class="meta"><span>12 replies</span><span>48 reposts</span><span>310 likes</span></div></div></div>
+      <div class="post"><div class="av" style="background:#4cb782">JO</div><div><div class="who"><b>Jonas Ortiz</b><span>@jonas · 4h</span></div><p>Shipping a tiny side project this weekend. Notes on what worked and what didn't, coming soon.</p><div class="meta"><span>3 replies</span><span>9 reposts</span><span>96 likes</span></div></div></div>
+      <div class="post"><div class="av" style="background:#7a6cff">AK</div><div><div class="who"><b>Ana Kovač</b><span>@ana · 5h</span></div><p>Morning walk, coffee, then deep work until lunch. The trick is not opening anything that pulls you sideways.</p><div class="meta"><span>21 replies</span><span>30 reposts</span><span>402 likes</span></div></div></div>
+    </main>
+    <aside class="side" aria-label="Sidebar">
+      <div class="search">Search Daily Feed</div>
+      <div class="promo" aria-label="Upgrade"><b>Go Plus for $4/month</b>Fewer ads, longer posts, bigger uploads.<br><button>Upgrade</button></div>
+      <section class="box" aria-label="Trending now">
+        <h2>Trending now</h2>
+        <div class="row"><div class="t">#WeekendBuilds<span>4,210 posts</span></div></div>
+        <div class="row"><div class="t">Local elections<span>18.5K posts</span></div></div>
+        <div class="row"><div class="t">Champions final<span>52K posts</span></div></div>
+        <a class="more" href="#">Show more</a>
+      </section>
+      <section class="box" aria-label="Suggested for you">
+        <h2>Suggested for you</h2>
+        <div class="row"><div class="av" style="background:#e0a400;width:36px;height:36px">LT</div><div class="t">Lena Tan<span>@lenat</span></div><button>Follow</button></div>
+        <div class="row"><div class="av" style="background:#1ea7c5;width:36px;height:36px">BW</div><div class="t">Ben Walsh<span>@benw</span></div><button>Follow</button></div>
+        <div class="row"><div class="av" style="background:#c0508f;width:36px;height:36px">SN</div><div class="t">Sara Nyberg<span>@saran</span></div><button>Follow</button></div>
+        <a class="more" href="#">Show more</a>
+      </section>
+    </aside>
+  </div>
+</body>
+</html>

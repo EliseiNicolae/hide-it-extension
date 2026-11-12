@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Hide It</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <img src="icons/icon32.png" width="22" height="22" alt="">
+    <div class="title">
+      <strong>Hide It</strong>
+      <span id="site"></span>
+    </div>
+    <label class="switch" id="switch" title="Hide elements on this site">
+      <input type="checkbox" id="enabled" checked>
+      <span aria-hidden="true"></span>
+    </label>
+  </header>
+
+  <main id="main">
+    <button id="pick" class="primary">
+      <span>Pick an element to hide</span>
+      <kbd id="shortcut"></kbd>
+    </button>
+
+    <div class="section-head">
+      <span id="count">Hidden on this site</span>
+      <button id="clear" class="link" hidden>Show all</button>
+    </div>
+    <ul id="list"></ul>
+    <p id="empty" class="muted">Nothing hidden here yet. Pick an element, click it — gone.<br>Hover a row below to see it again.</p>
+    <p id="peek-hint" class="muted foot">Hold <kbd>⌥</kbd> on the page to peek at everything hidden.<br><kbd>⇧</kbd>-click while picking (or <span class="inline-icon">↖</span> on a row) keeps an element invisible until you point at its place.</p>
+  </main>
+
+  <p id="unsupported" class="muted" hidden>Chrome doesn't let extensions change this page.</p>
+
+  <footer id="transfer">
+    <div class="transfer-row">
+      <button id="copy" class="link">Copy all rules</button>
+      <span class="sep" aria-hidden="true">·</span>
+      <button id="paste" class="link">Paste rules</button>
+      <span class="transfer-what">between Chrome profiles</span>
+    </div>
+    <div id="paste-box" hidden>
+      <textarea id="paste-input" rows="2" spellcheck="false"></textarea>
+      <button id="paste-cancel" class="link">Cancel</button>
+    </div>
+    <p id="transfer-msg" class="muted" hidden></p>
+  </footer>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>
