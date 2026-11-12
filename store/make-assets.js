@@ -32,16 +32,28 @@ function popupFrame(popupShot, w, h) {
   return `<!doctype html><html><body style="margin:0;width:1280px;height:800px;overflow:hidden;
     background:linear-gradient(160deg,#fbfbfc,#eceef3);font-family:${FONT};color:#16181d">
     <div style="position:absolute;left:120px;top:0;bottom:0;width:520px;display:flex;flex-direction:column;justify-content:center">
-      <div style="font-size:40px;font-weight:780;letter-spacing:-.5px;line-height:1.12">Everything you hid,<br>in one list.</div>
+      <div style="font-size:40px;font-weight:780;letter-spacing:-.5px;line-height:1.12">Hidden on<br>this site</div>
       <ul style="margin:28px 0 0;padding:0;list-style:none;font-size:19px;line-height:1.5;color:#3c424c">
-        <li style="margin-bottom:14px"><b style="color:#16181d">Point at a row</b> — the element shows again, outlined.</li>
-        <li style="margin-bottom:14px"><b style="color:#16181d">✕</b> brings it back for good.</li>
-        <li style="margin-bottom:14px"><b style="color:#16181d">↖</b> keeps it invisible until you point at its place.</li>
-        <li><b style="color:#16181d">Hold ⌥ / Alt</b> on the page to peek at everything hidden.</li>
+        <li style="margin-bottom:14px">Hover a row to preview the element.</li>
+        <li style="margin-bottom:14px">Click ✕ to bring it back.</li>
+        <li style="margin-bottom:14px">Click ↖ to show it only on hover.</li>
+        <li>Hold Alt on the page to see everything hidden.</li>
       </ul>
     </div>
     <img src="${dataUrl(popupShot)}" style="position:absolute;right:150px;top:${Math.round((800 - h) / 2)}px;width:${w}px;height:${h}px;
       border-radius:14px;box-shadow:0 0 0 1px rgba(0,0,0,.1),0 24px 60px rgba(20,24,40,.25)">
+  </body></html>`;
+}
+
+// README image: the same page before and after, side by side. Transparent around the two
+// shots and mid-gray labels, so it sits well on GitHub's light and dark themes.
+function beforeAfter(before, after) {
+  const panel = (shot, label) => `<figure style="margin:0;width:800px">
+      <figcaption style="margin:0 0 10px 2px;font-size:20px;font-weight:600;color:#8b949e">${label}</figcaption>
+      <img src="${dataUrl(shot)}" style="display:block;width:800px;height:500px;border-radius:10px;box-shadow:0 0 0 1px rgba(128,128,128,.35)">
+    </figure>`;
+  return `<!doctype html><html><body style="margin:0;background:transparent;font-family:${FONT}">
+    <div style="display:flex;gap:40px;padding:12px 20px 20px">${panel(before, 'Before')}${panel(after, 'After')}</div>
   </body></html>`;
 }
 
@@ -83,6 +95,8 @@ function promoTile(icon) {
     const extId = sw.url().split('/')[2];
     const page = ctx.pages()[0] || (await ctx.newPage());
     await page.goto(`${base}/demo.html`);
+    await wait(300);
+    const rawBefore = await page.screenshot();
     const tabId = await sw.evaluate(async (h) => (await chrome.tabs.query({})).find((t) => (t.url || '').includes(h)).id, HOST);
     const startPicker = () => sw.evaluate(async (id) => chrome.tabs.sendMessage(id, { type: 'startPicker' }), tabId);
 
@@ -135,9 +149,9 @@ function promoTile(icon) {
     const compose = await ctx.newPage();
     await compose.setViewportSize({ width: 1280, height: 800 });
     const shots = [
-      ['screenshot-1-pick.png', frame(raw1, 'Point at it. Click. Gone.', 'It outlines the whole block first — scroll down to narrow it to exactly the part you want gone.')],
-      ['screenshot-2-clean.png', frame(raw2, 'The page, minus the noise.', 'Hidden with CSS before the page paints — nothing flashes in first, even on apps that load late.')],
-      ['screenshot-3-peek.png', frame(raw3, 'Hold ⌥ / Alt to peek.', 'Everything you hid comes back, outlined, until you let go.')],
+      ['screenshot-1-pick.png', frame(raw1, 'Pick an element', 'Scroll to make the selection smaller or bigger, then click to hide it.')],
+      ['screenshot-2-clean.png', frame(raw2, 'After hiding', 'Hidden elements stay hidden on every visit and don’t show up while the page loads.')],
+      ['screenshot-3-peek.png', frame(raw3, 'Hold Alt to see what’s hidden', 'Hidden elements show up with an outline until you let go.')],
       ['screenshot-4-popup.png', popupFrame(popupShot, 340 * 1.25, h * 1.25)],
     ];
     for (const [name, html] of shots) {
@@ -145,6 +159,13 @@ function promoTile(icon) {
       await compose.waitForLoadState('load');
       await compose.screenshot({ path: path.join(OUT, name) });
     }
+    const docs = path.join(EXT, 'docs');
+    fs.mkdirSync(docs, { recursive: true });
+    await compose.setViewportSize({ width: 1680, height: 576 });
+    await compose.setContent(beforeAfter(rawBefore, raw2));
+    await compose.waitForLoadState('load');
+    await compose.screenshot({ path: path.join(docs, 'before-after.png'), omitBackground: true });
+
     await compose.setViewportSize({ width: 440, height: 280 });
     await compose.setContent(promoTile(fs.readFileSync(path.join(EXT, 'icons/icon128.png'))));
     await compose.waitForLoadState('load');

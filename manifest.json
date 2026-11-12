@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Hide It",
   "version": "1.0.0",
-  "description": "Point at any part of a website and hide it for good — no flicker, undo any time.",
+  "description": "Hide parts of websites. Hidden elements stay hidden and never show up while a page loads.",
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",

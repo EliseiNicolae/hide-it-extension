@@ -7,33 +7,24 @@ Images: `store/assets/` (re-render with `node store/make-assets.js`).
 
 **Name:** Hide It
 
-**Summary** (82/132 chars):
-Point at any part of a website and hide it for good — no flicker, undo any time.
+**Summary** (same as the manifest description, 89/132 chars):
+Hide parts of websites. Hidden elements stay hidden and never show up while a page loads.
 
 **Category:** Productivity → Tools · **Language:** English
 
 **Description:**
 
-Hide the parts of a website you don't want to see — sidebars, suggestion boxes, promos, trending lists, sticky banners — and they stay hidden every time you come back.
+Hide sidebars, suggestion boxes, promos or anything else on a website. They stay hidden every time you come back, and they don't show up while the page loads.
 
-HOW IT WORKS
-• Click the Hide It icon (or press ⌥⇧H / Alt+Shift+H) and point at the page.
-• The outline starts on the whole block under the pointer — scroll down (or ↓) to narrow it to exactly the part you want gone, up (or ↑) to widen it.
-• Click. It's hidden — on this site, from now on.
-• Undo with ⌘Z / Ctrl+Z, or bring anything back from the list in the popup.
+How to use it:
+• Click the icon or press Alt+Shift+H, then point at the page.
+• Scroll to make the selection smaller or bigger, and click to hide it.
+• Shift+click keeps the element in place but invisible. It shows up again when you hover over it.
+• Hold Alt to see everything you've hidden on the page.
+• The popup lists what's hidden on the current site. Hover a row to preview it, or click ✕ to bring it back.
+• Undo with Cmd+Z / Ctrl+Z while picking.
 
-NO FLICKER
-Hidden elements are removed with CSS before the page paints, so they never flash in first — even on apps that build the page long after it loads.
-
-PEEK AND HOVER
-• Hold ⌥ / Alt on a page to see everything you hid, outlined, until you let go.
-• ⇧-click (or the ↖ button in the list) keeps an element invisible but in place: point at its spot and it fades in.
-
-THE LIST
-The popup lists what's hidden on the current site. Point at a row to see that element again, ✕ to bring it back for good, or switch the site off for a moment.
-
-PRIVATE BY DESIGN
-Everything stays in your browser. Hide It has no servers, no accounts, no analytics, and never reads or sends the content of the pages you visit.
+Rules are stored locally in Chrome. The extension doesn't make any network requests and doesn't collect any data.
 
 ## Images
 

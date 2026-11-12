@@ -2,7 +2,7 @@
   "name": "hide-it-extension",
   "version": "1.0.0",
   "private": true,
-  "description": "Chrome extension: point at any part of a website and hide it for good — no flicker.",
+  "description": "Chrome extension for hiding parts of websites.",
   "license": "MIT",
   "scripts": {
     "test": "node test/e2e.js",
