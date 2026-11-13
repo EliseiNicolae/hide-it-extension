@@ -2,7 +2,7 @@
   "name": "hide-it-extension",
   "version": "1.0.0",
   "private": true,
-  "description": "Chrome extension for hiding parts of websites.",
+  "description": "Chrome extension for hiding distracting parts of websites.",
   "license": "MIT",
   "scripts": {
     "test": "node test/e2e.js",

@@ -7,14 +7,14 @@ Images: `store/assets/` (re-render with `node store/make-assets.js`).
 
 **Name:** Hide It
 
-**Summary** (same as the manifest description, 89/132 chars):
-Hide parts of websites. Hidden elements stay hidden and never show up while a page loads.
+**Summary** (same as the manifest description, 90/132 chars):
+Hide distracting parts of websites. They stay hidden and never show up while a page loads.
 
 **Category:** Productivity → Tools · **Language:** English
 
 **Description:**
 
-Hide sidebars, suggestion boxes, promos or anything else on a website. They stay hidden every time you come back, and they don't show up while the page loads.
+Hide distracting content on websites: sidebars, suggestion boxes, promos or anything else. It stays hidden every time you come back and doesn't show up while the page loads.
 
 How to use it:
 • Click the icon or press Alt+Shift+H, then point at the page.

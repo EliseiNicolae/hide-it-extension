@@ -136,7 +136,7 @@ function promoTile(icon) {
     <img src="${dataUrl(icon)}" style="width:96px;height:96px;border-radius:22px;box-shadow:0 10px 30px rgba(80,0,10,.35),0 0 0 2px rgba(255,255,255,.35)">
     <div>
       <div style="font-size:42px;font-weight:800;letter-spacing:-.5px">Hide It</div>
-      <div style="margin-top:6px;font-size:18px;line-height:1.3;opacity:.95">Hide any part of any website.<br>No flicker. Undo any time.</div>
+      <div style="margin-top:6px;font-size:18px;line-height:1.3;opacity:.95">Hide distracting parts<br>of any website.</div>
     </div>
   </body></html>`;
 }

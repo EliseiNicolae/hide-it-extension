@@ -1,6 +1,6 @@
 # Hide It
 
-A Chrome extension for hiding parts of websites. Hidden elements stay hidden on every visit and don't show up while the page loads.
+A Chrome extension for hiding distracting parts of websites. They stay hidden on every visit and don't show up while the page loads.
 
 ![Before and after](docs/before-after.png)
 
