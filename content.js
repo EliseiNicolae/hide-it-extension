@@ -108,6 +108,15 @@
     return css;
   }
 
+  // ---------------------------------------------------------------- picker keys
+
+  // While picking, keys (Esc, ↑ ↓, Enter, ⌘Z) are the picker's. Listened for here, at
+  // document_start, before any page script: this runs first, so a page's own Esc handler
+  // (a gallery, a video player) can't swallow the key before the picker sees it.
+  listen(window, 'keydown', (e) => {
+    if (picker) picker.key(e);
+  }, true);
+
   // ---------------------------------------------------------------- peek: hold ⌥
 
   // Holding ⌥ on its own for a moment shows everything hidden; letting go hides it again.
@@ -588,8 +597,13 @@
     const toastEl = make('div', 'toast');
     root.append(style, box, bar, toastEl);
 
+    // Frames (ads, players, embeds) let the pointer through while picking. Otherwise the page
+    // inside one takes the hover and the click — an ad opens instead of being hidden — and,
+    // once clicked, the keyboard too: Esc would go to the frame and the picker would stay.
     const cursor = document.createElement('style');
-    cursor.textContent = 'html, html * { cursor: crosshair !important; }';
+    cursor.textContent =
+      'html, html * { cursor: crosshair !important; }\n' +
+      'iframe, frame, embed, object { pointer-events: none !important; }';
     document.documentElement.append(cursor, host);
 
     let hoverEl = null; // deepest element under the pointer
@@ -615,12 +629,36 @@
 
     const fromUI = (e) => e.composedPath().includes(host);
 
+    // With frames letting the pointer through, elementFromPoint lands on what's behind one:
+    // step back into the frame that covers the point.
+    const frames = document.getElementsByTagName('iframe');
+    function frameAt(el, x, y) {
+      let found = null;
+      for (const f of frames) {
+        if (!el.contains(f)) continue;
+        const r = rectOf(f);
+        if (r.width && r.height && x >= r.left && x < r.right && y >= r.top && y < r.bottom) found = f;
+      }
+      return found;
+    }
+
     function hit(x, y) {
       if (x < 0 || y < 0) return null;
-      const el = document.elementFromPoint(x, y);
-      if (!el || el === host || isPage(el)) return null;
-      return el;
+      let el = document.elementFromPoint(x, y);
+      if (!el || el === host) return null;
+      el = frameAt(el, x, y) || el;
+      return isPage(el) ? null : el;
     }
+
+    // Keys reach only the window that has the focus. If a frame holds it (a player clicked
+    // before picking, a script focusing an ad), Esc would never get here: take it back.
+    function releaseFrameFocus() {
+      const a = document.activeElement;
+      if (a && /^(IFRAME|FRAME|EMBED|OBJECT)$/.test(a.tagName)) a.blur();
+    }
+    releaseFrameFocus();
+    // Focus moving into a frame blurs this window: the frame has it by the next task.
+    on(window, 'blur', () => setTimeout(() => picker && releaseFrameFocus()));
 
     // Lines — separators, a card emptied down to its border — are too thin to land on:
     // one within THIN_REACH px of the pointer wins over what's under it.
@@ -945,7 +983,8 @@
       else smaller();
     }, { capture: true, passive: false });
 
-    on(window, 'keydown', (e) => {
+    // Called by the window keydown listener set up at document_start (see "picker keys").
+    function key(e) {
       const k = e.key;
       let handled = true;
       if (k === 'Escape') stop();
@@ -962,7 +1001,7 @@
         e.preventDefault();
         e.stopImmediatePropagation();
       }
-    }, true);
+    }
 
     undoBtn.addEventListener('click', () => undo());
     doneBtn.addEventListener('click', () => stop());
@@ -992,7 +1031,7 @@
     }
 
     refreshCount();
-    return { stop, focus, refreshCount };
+    return { stop, focus, refreshCount, key };
   }
 
   // ---------------------------------------------------------------- teardown

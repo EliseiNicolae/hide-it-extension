@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Frame mock</title>
+<!-- Shaped like a news site's ad slot: a cross-origin iframe (here: localhost vs 127.0.0.1)
+     filling its container. The page inside a frame gets the pointer and, once clicked, the keyboard. -->
+<style>
+  body { margin: 0; font: 16px/1.6 Georgia, serif; }
+  header { height: 80px; background: #ddd; }
+  #ad { width: 600px; height: 250px; margin: 20px; }
+  #ad iframe { width: 100%; height: 100%; border: 0; display: block; }
+  article { max-width: 700px; margin: 0 20px; height: 900px; }
+</style>
+</head>
+<body>
+<header>Header</header>
+<div id="ad"><iframe title="Advertisement"></iframe></div>
+<article>Article text.</article>
+<script>
+  document.querySelector('#ad iframe').src = `${location.protocol}//localhost:${location.port}/frame-ad.html`;
+</script>
+</body>
+</html>

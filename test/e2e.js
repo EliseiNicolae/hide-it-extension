@@ -492,6 +492,52 @@ const check = (name, ok, detail = '') => {
     const lt2 = await measure();
     check('the loose text stays hidden after a reload', lt2.textW === 0 && lt2.em === lt0.em, `text width ${lt2.textW}, em ${lt2.em}`);
 
+    // ---- Frames (a cross-origin ad, a player) take neither the picker's clicks nor its keys:
+    // Esc ends the picker however the focus got into a frame, and even when the page has an
+    // Esc handler of its own that stops the key.
+    await page.goto(`${base}/frame-mock.html`);
+    const adFrame = page.frameLocator('#ad iframe');
+    await adFrame.locator('#ad-input').waitFor();
+    await adFrame.locator('#ad-input').click(); // the focus is in the frame before picking
+    await startPicker();
+    await page.keyboard.press('Escape');
+    check('Esc closes the picker when a frame had the focus', !(await hasUI()));
+
+    await adFrame.locator('body').evaluate((b) => delete b.dataset.clicked); // that click was ours
+    await startPicker();
+    // Chrome hit-tests a cross-origin frame in the browser: the frame's pointer-events take
+    // effect once a new frame is drawn (a person never clicks that fast).
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    const adBox = await page.locator('#ad').boundingBox();
+    await page.mouse.move(adBox.x + 40, adBox.y + 40);
+    await page.mouse.move(adBox.x + 41, adBox.y + 41);
+    await page.mouse.click(adBox.x + 41, adBox.y + 41);
+    await page.waitForTimeout(200);
+    const beforeAd = rules.length;
+    rules = await getRules();
+    const adState = await page.evaluate(() => ({
+      focus: document.activeElement.tagName,
+      shown: document.querySelector('#ad iframe').getClientRects().length > 0,
+    }));
+    const adClicked = await adFrame.locator('body').getAttribute('data-clicked');
+    check('clicking an ad frame while picking hides it, without clicking the ad',
+      rules.length > beforeAd && !adState.shown && adState.focus !== 'IFRAME' && !adClicked,
+      `${rules[rules.length - 1].selector} — ${JSON.stringify({ ...adState, adClicked })}`);
+    await page.keyboard.press('Escape');
+    check('…and Esc still closes the picker', !(await hasUI()));
+    await sw.evaluate(async ([k, id]) => {
+      const d = (await chrome.storage.local.get(k))[k];
+      await chrome.storage.local.set({ [k]: { ...d, rules: d.rules.filter((r) => r.id !== id) } });
+    }, [KEY, rules[rules.length - 1].id]);
+    rules = await getRules();
+
+    await page.evaluate(() => window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') e.stopImmediatePropagation();
+    }, true));
+    await startPicker();
+    await page.keyboard.press('Escape');
+    check('Esc closes the picker even when the page stops Esc itself', !(await hasUI()));
+
     // ---- A long list keeps the popup within Chrome's 600 px; the list scrolls, thin and themed.
     const lhPage = await ctx.newPage();
     await lhPage.goto(`${base.replace('127.0.0.1', 'localhost')}/x-mock.html`);

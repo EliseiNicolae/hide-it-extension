@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ad</title>
+<style>
+  body { margin: 0; height: 100vh; background: #fc0; font: 20px system-ui, sans-serif; }
+</style>
+</head>
+<body>
+<p>AD — click me</p>
+<input id="ad-input" aria-label="Ad field">
+<script>
+  // A click that reaches the ad itself (instead of the picker) leaves a mark.
+  document.addEventListener('click', () => (document.body.dataset.clicked = '1'));
+</script>
+</body>
+</html>
